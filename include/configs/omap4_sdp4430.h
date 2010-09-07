@@ -106,6 +106,7 @@
 
 /* TWL6030 */
 #define CONFIG_TWL6030_POWER		1
+#define CONFIG_CMD_BAT			1
 
 /* MMC */
 #define CONFIG_MMC			1
