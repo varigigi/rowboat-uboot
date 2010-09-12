@@ -123,6 +123,11 @@ int checkboard(void)
 */
 int arch_cpu_init(void)
 {
-	set_muxconf_regs();
+	/*
+	 * x-loader is configuring mux
+	 * Bring back mux configuration in u-boot when x-loader is eventually
+	 * removed
+	 */
+	/* set_muxconf_regs(); */
 	return 0;
 }
