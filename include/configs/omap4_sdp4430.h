@@ -66,7 +66,6 @@
  * Total Size Environment - 256k
  * Malloc - add 256k
  */
-#define CONFIG_ENV_SIZE			(256 << 10)
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (256 << 10))
 #define CONFIG_SYS_GBL_DATA_SIZE	128	/* bytes reserved for */
 						/* initial data */
@@ -89,8 +88,13 @@
 #define CONFIG_CONS_INDEX		3
 #define CONFIG_SYS_NS16550_COM3		UART3_BASE
 
-#define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_ENV_OVERWRITE
+/* ENV related defines */
+#define CONFIG_ENV_IS_IN_MMC		1
+#define CONFIG_ENV_OVERWRITE		1
+#define CONFIG_SYS_MMC_ENV_DEV		1 /* SLOT2: eMMC(1) */	
+#define CONFIG_ENV_OFFSET		0xE0000
+#define CONFIG_ENV_SIZE			(128 << 10)
+
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{4800, 9600, 19200, 38400, 57600,\
 					115200}
@@ -150,6 +154,7 @@
 #define CONFIG_CMD_MMC		/* MMC support                  */
 #define CONFIG_CMD_NET		/* bootp, tftpboot, rarpboot	*/
 #define CONFIG_CMD_NFS		/* NFS support			*/
+#define CONFIG_CMD_SAVEENV
 
 /* Disabled commands */
 #undef CONFIG_CMD_FPGA		/* FPGA configuration Support   */
