@@ -25,6 +25,7 @@
 #include <common.h>
 #include <netdev.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/arch/mmc_host_def.h>
 
 #include "sdp.h"
 
@@ -94,3 +95,12 @@ void set_muxconf_regs(void)
 		   sizeof(wkup_padconf_array) /
 		   sizeof(struct pad_conf_entry));
 }
+
+#ifdef CONFIG_GENERIC_MMC
+int board_mmc_init(bd_t *bis)
+{
+	omap_mmc_init(0);
+	omap_mmc_init(1);
+	return 0;
+}
+#endif

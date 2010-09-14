@@ -109,8 +109,9 @@
 #define CONFIG_CMD_BAT			1
 
 /* MMC */
+#define CONFIG_GENERIC_MMC		1
 #define CONFIG_MMC			1
-#define CONFIG_OMAP3_MMC		1
+#define CONFIG_OMAP_HSMMC		1
 #define CONFIG_SYS_MMC_SET_DEV		1
 #define CONFIG_DOS_PARTITION		1
 
