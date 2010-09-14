@@ -129,3 +129,11 @@ int board_eth_init(bd_t *bis)
 	return dm9000_initialize(bis);
 }
 #endif
+
+#ifdef CONFIG_GENERIC_MMC
+int board_mmc_init(bd_t *bis)
+{
+	omap_mmc_init(0);
+	return 0;
+}
+#endif
