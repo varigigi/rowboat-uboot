@@ -164,7 +164,7 @@
 	"console=ttyO2,115200n8\0" \
 	"usbtty=cdc_acm\0" \
 	"vram=16M\0" \
-	"mmcdev=1\0" \
+	"mmcdev=0\0" \
 	"mmcroot=/dev/mmcblk0p2 rw\0" \
 	"mmcrootfstype=ext3 rootwait\0" \
 	"mmcargs=setenv bootargs console=${console} " \
@@ -180,7 +180,7 @@
 		"bootm ${loadaddr}\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	"if mmc init ${mmcdev}; then " \
+	"if mmc rescan ${mmcdev}; then " \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
 		"else " \
