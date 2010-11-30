@@ -189,14 +189,16 @@
 #endif /* CONFIG_MUSB_HCD */
 
 #ifdef CONFIG_MUSB_UDC
+#define CONFIG_USB_DEVICE
+
 #ifdef CONFIG_FASTBOOT
 /* Fastboot settings */
 #define        CONFIG_CMD_FASTBOOT
 #define        CONFIG_FASTBOOT_TRANSFER_BUFFER         (PHYS_SDRAM_1 + SZ_16M)
 #define        CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    (SZ_128M - SZ_16M)
-#else
+#endif /* CONFIG_FASTBOOT */
+
 /* USB device configuration */
-#define CONFIG_USB_DEVICE
 #define CONFIG_USB_TTY
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -205,7 +207,6 @@
 #define CONFIG_USBD_PRODUCTID		0x5678
 #define CONFIG_USBD_MANUFACTURER	"Texas Instruments"
 #define CONFIG_USBD_PRODUCT_NAME	"EVM"
-#endif /* CONFIG_FASTBOOT */
 #endif /* CONFIG_MUSB_UDC */
 
 #endif /* CONFIG_USB_OMAP3 */
