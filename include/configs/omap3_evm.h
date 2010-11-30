@@ -33,6 +33,9 @@
 #ifndef __OMAP3EVM_CONFIG_H
 #define __OMAP3EVM_CONFIG_H
 
+/* Android fast boot */
+#define  CONFIG_FASTBOOT
+
 #include <asm/arch/cpu.h>
 #include <asm/arch/omap3.h>
 
@@ -185,5 +188,12 @@
 			"fi; " \
 		"fi; " \
 	"else run nandboot; fi"
+
+/* Fastboot */
+#ifdef CONFIG_FASTBOOT
+#define   CONFIG_CMD_FASTBOOT
+#define   CONFIG_FASTBOOT_TRANSFER_BUFFER         (PHYS_SDRAM_1 + SZ_16M)
+#define   CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    (SZ_128M - SZ_16M)
+#endif /* CONFIG_FASTBOOT */
 
 #endif /* __OMAP3EVM_CONFIG_H */
