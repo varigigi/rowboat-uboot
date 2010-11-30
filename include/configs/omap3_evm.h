@@ -100,11 +100,11 @@
 /* USB
  *
  * Enable CONFIG_MUSB_HCD for Host functionalities MSC, keyboard
- * Enable CONFIG_MUSB_UDD for Device functionalities.
+ * Enable CONFIG_MUSB_UDC for Device functionalities.
  */
 #define CONFIG_USB_OMAP3
-#define CONFIG_MUSB_HCD
-/* #define CONFIG_MUSB_UDC */
+/* #define CONFIG_MUSB_HCD */
+#define CONFIG_MUSB_UDC
 
 /* NAND SPL */
 #define CONFIG_SPL_NAND_SIMPLE
@@ -188,12 +188,5 @@
 			"fi; " \
 		"fi; " \
 	"else run nandboot; fi"
-
-/* Fastboot */
-#ifdef CONFIG_FASTBOOT
-#define   CONFIG_CMD_FASTBOOT
-#define   CONFIG_FASTBOOT_TRANSFER_BUFFER         (PHYS_SDRAM_1 + SZ_16M)
-#define   CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    (SZ_128M - SZ_16M)
-#endif /* CONFIG_FASTBOOT */
 
 #endif /* __OMAP3EVM_CONFIG_H */
