@@ -35,6 +35,7 @@
 
 /* Android fast boot */
 #define  CONFIG_FASTBOOT
+/* #define      CONFIG_CMD_USBTEST */
 
 #include <asm/arch/cpu.h>
 #include <asm/arch/omap3.h>
