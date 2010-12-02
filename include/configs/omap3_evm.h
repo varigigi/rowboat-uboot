@@ -39,6 +39,7 @@
 
 #include <asm/arch/cpu.h>
 #include <asm/arch/omap3.h>
+#include <asm/sizes.h>
 
 /* ----------------------------------------------------------------------------
  * Supported U-boot commands
