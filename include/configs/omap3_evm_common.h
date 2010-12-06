@@ -199,6 +199,8 @@
 /* if already present, use already existing NAND macros for block & oob size */
 #define        FASTBOOT_NAND_BLOCK_SIZE                 2048
 #define        FASTBOOT_NAND_OOB_SIZE                   64
+/* Fastboot product name */
+#define        FASTBOOT_PRODUCT_NAME                    "OMAP3 EVM"
 #endif /* CONFIG_FASTBOOT */
 
 /* USB device configuration */
