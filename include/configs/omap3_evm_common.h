@@ -189,8 +189,6 @@
 #endif /* CONFIG_MUSB_HCD */
 
 #ifdef CONFIG_MUSB_UDC
-#define CONFIG_USB_DEVICE
-
 #ifdef CONFIG_FASTBOOT
 /* Fastboot settings */
 #define        CONFIG_CMD_FASTBOOT
@@ -201,11 +199,15 @@
 #define        FASTBOOT_NAND_OOB_SIZE                   64
 /* Fastboot product name */
 #define        FASTBOOT_PRODUCT_NAME                    "omap3evm"
-#endif /* CONFIG_FASTBOOT */
-
+/* Use HS */
+#define        USB_BCD_VERSION                          0x0200
+#else
 /* USB device configuration */
 #define CONFIG_USB_TTY
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#endif /* CONFIG_FASTBOOT */
+
+#define CONFIG_USB_DEVICE
 
 /* Change these to suit your needs */
 #define CONFIG_USBD_VENDORID		0x0451
