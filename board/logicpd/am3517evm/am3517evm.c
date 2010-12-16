@@ -47,6 +47,15 @@ int board_init(void)
 	/* boot param addr */
 	gd->bd->bi_boot_params = (OMAP34XX_SDRC_CS0 + 0x100);
 
+#ifdef	CONFIG_CMD_FASTBOOT
+#ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
+	int i;
+
+	for (i = 0; i < 6; i++)
+		fastboot_flash_add_ptn (&ptn[i]);
+#endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
+#endif /* CONFIG_CMD_FASTBOOT */
+
 	return 0;
 }
 
