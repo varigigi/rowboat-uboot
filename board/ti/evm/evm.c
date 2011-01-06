@@ -55,7 +55,7 @@ fastboot_ptentry ptn[6] = {
 		{
 		.name   = "bootloader",
 		.start  = 0x0080000,
-		.length = 0x0180000, /* 1.5 M */
+		.length = 0x01C0000,
 		/* Skip bad blocks on write
 		   Use HW ECC */
 		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_I |
@@ -75,24 +75,17 @@ fastboot_ptentry ptn[6] = {
 		   Change to what is required */
 		/* .start  = 0x0a00000, */
 			/* The real start */
-		.start  = 0x02a0000,
-		.length = 0x1D00000, /* 30M */
+		.start  = 0x0280000,
+		.length = 0x0500000,
 		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC |
 		FASTBOOT_PTENTRY_FLAGS_WRITE_I,
 	},
 	{
 		.name   = "system",
-		.start  = 0x2100000,
-		.length = 0xB400000, /* 180M */
+		.start  = 0x0780000,
+		.length = 0xF880000,
 		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC |
-		FASTBOOT_PTENTRY_FLAGS_WRITE_JFFS2,
-	},
-	{
-		.name   = "userdata",
-		.start  = 0xD500000,
-		.length = 0x4000000, /* 64M */
-		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC |
-		FASTBOOT_PTENTRY_FLAGS_WRITE_JFFS2,
+		FASTBOOT_PTENTRY_FLAGS_WRITE_I,
 	},
 };
 #endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
