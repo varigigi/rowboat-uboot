@@ -36,7 +36,12 @@
 #include <i2c.h>
 #include <asm/mach-types.h>
 #include <fastboot.h>
+
+#ifdef CONFIG_FLASHBOARD
+#include "flashboard.h"
+#else
 #include "evm.h"
+#endif
 
 #ifdef	CONFIG_CMD_FASTBOOT
 #ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
@@ -155,6 +160,12 @@ int board_init(void)
  */
 int misc_init_r(void)
 {
+#ifdef CONFIG_FLASHBOARD
+	/*
+	 * Configure drive strength for IO cells
+	 */
+	*(ulong *)(CONTROL_PROG_IO2) &= ~(PRG_I2C3_PULLUPRESX);
+#endif
 
 #ifdef CONFIG_DRIVER_OMAP34XX_I2C
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
@@ -192,16 +203,26 @@ static void setup_net_chip(void)
 	struct ctrl *ctrl_base = (struct ctrl *)OMAP34XX_CTRL_BASE;
 
 	/* Configure GPMC registers */
-	writel(NET_GPMC_CONFIG1, &gpmc_cfg->cs[5].config1);
-	writel(NET_GPMC_CONFIG2, &gpmc_cfg->cs[5].config2);
-	writel(NET_GPMC_CONFIG3, &gpmc_cfg->cs[5].config3);
-	writel(NET_GPMC_CONFIG4, &gpmc_cfg->cs[5].config4);
-	writel(NET_GPMC_CONFIG5, &gpmc_cfg->cs[5].config5);
-	writel(NET_GPMC_CONFIG6, &gpmc_cfg->cs[5].config6);
-	writel(NET_GPMC_CONFIG7, &gpmc_cfg->cs[5].config7);
+#ifdef CONFIG_FLASHBOARD
+		writel(NET_GPMC_CONFIG1, &gpmc_cfg->cs[3].config1);
+		writel(NET_GPMC_CONFIG2, &gpmc_cfg->cs[3].config2);
+		writel(NET_GPMC_CONFIG3, &gpmc_cfg->cs[3].config3);
+		writel(NET_GPMC_CONFIG4, &gpmc_cfg->cs[3].config4);
+		writel(NET_GPMC_CONFIG5, &gpmc_cfg->cs[3].config5);
+		writel(NET_GPMC_CONFIG6, &gpmc_cfg->cs[3].config6);
+		writel(NET_GPMC_CONFIG7, &gpmc_cfg->cs[3].config7);
+#else
+		writel(NET_GPMC_CONFIG1, &gpmc_cfg->cs[5].config1);
+		writel(NET_GPMC_CONFIG2, &gpmc_cfg->cs[5].config2);
+		writel(NET_GPMC_CONFIG3, &gpmc_cfg->cs[5].config3);
+		writel(NET_GPMC_CONFIG4, &gpmc_cfg->cs[5].config4);
+		writel(NET_GPMC_CONFIG5, &gpmc_cfg->cs[5].config5);
+		writel(NET_GPMC_CONFIG6, &gpmc_cfg->cs[5].config6);
+		writel(NET_GPMC_CONFIG7, &gpmc_cfg->cs[5].config7);
+#endif
 
 	/* Enable off mode for NWE in PADCONF_GPMC_NWE register */
-	writew(readw(&ctrl_base ->gpmc_nwe) | 0x0E00, &ctrl_base->gpmc_nwe);
+	writew(readw(&ctrl_base->gpmc_nwe) | 0x0E00, &ctrl_base->gpmc_nwe);
 	/* Enable off mode for NOE in PADCONF_GPMC_NADV_ALE register */
 	writew(readw(&ctrl_base->gpmc_noe) | 0x0E00, &ctrl_base->gpmc_noe);
 	/* Enable off mode for ALE in PADCONF_GPMC_NADV_ALE register */

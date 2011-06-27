@@ -64,6 +64,11 @@
 /* Bit definition for CONTROL_PROG_IO1 */
 #define PRG_I2C2_PULLUPRESX		0x00000001
 
+#ifdef CONFIG_FLASHBOARD
+/* Bit definition for CONTROL_PROG_IO2 */
+#define PRG_I2C3_PULLUPRESX		0x00000080
+#endif
+
 /* 14/12-end */
 
 

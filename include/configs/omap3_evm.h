@@ -95,9 +95,15 @@
 /*
  * select serial console configuration
  */
+#ifdef CONFIG_FLASHBOARD
+#define CONFIG_CONS_INDEX		3
+#define CONFIG_SYS_NS16550_COM3		OMAP34XX_UART3
+#define CONFIG_SERIAL3			3	/* UART3 on Flash Board */
+#else
 #define CONFIG_CONS_INDEX		1
 #define CONFIG_SYS_NS16550_COM1		OMAP34XX_UART1
 #define CONFIG_SERIAL1			1	/* UART1 on OMAP3 EVM */
+#endif
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE

@@ -44,6 +44,16 @@ volatile unsigned int boot_flash_env_addr;
 struct gpmc *gpmc_cfg;
 
 #if defined(CONFIG_CMD_NAND)
+#ifdef CONFIG_FLASHBOARD
+static const u32 gpmc_sm_nand[GPMC_MAX_REG] = {
+	SMNAND_GPMC_CONFIG1,
+	SMNAND_GPMC_CONFIG2,
+	SMNAND_GPMC_CONFIG3,
+	SMNAND_GPMC_CONFIG4,
+	SMNAND_GPMC_CONFIG5,
+	SMNAND_GPMC_CONFIG6, 0
+};
+#else
 static const u32 gpmc_m_nand[GPMC_MAX_REG] = {
 	M_NAND_GPMC_CONFIG1,
 	M_NAND_GPMC_CONFIG2,
@@ -52,6 +62,7 @@ static const u32 gpmc_m_nand[GPMC_MAX_REG] = {
 	M_NAND_GPMC_CONFIG5,
 	M_NAND_GPMC_CONFIG6, 0
 };
+#endif
 
 #if defined(CONFIG_ENV_IS_IN_NAND)
 #define GPMC_CS 0
@@ -183,7 +194,11 @@ void gpmc_init(void)
 	sdelay(1000);
 
 #if defined(CONFIG_CMD_NAND)	/* CS 0 */
+#ifdef CONFIG_FLASHBOARD
+	gpmc_config = gpmc_sm_nand;
+#else
 	gpmc_config = gpmc_m_nand;
+#endif
 
 	base = PISMO1_NAND_BASE;
 	size = PISMO1_NAND_SIZE;

@@ -99,11 +99,24 @@ for i in ${TARGETS} ; do
 	echo "#define CONFIG_MK_${i} 1" >>config.h ;
 done
 
+if [ "$1" = "flashboard" ]
+then
+cat << EOF >> config.h
+
+#define CONFIG_BOARDDIR board/$BOARDDIR
+#define CONFIG_FLASHBOARD 1
+
+#include <config_defaults.h>
+#include <configs/omap3_evm.h>
+#include <asm/config.h>
+EOF
+else
 cat << EOF >> config.h
 #define CONFIG_BOARDDIR board/$BOARDDIR
 #include <config_defaults.h>
 #include <configs/$1.h>
 #include <asm/config.h>
 EOF
+fi
 
 exit 0
