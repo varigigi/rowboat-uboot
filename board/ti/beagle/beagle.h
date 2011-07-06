@@ -39,6 +39,8 @@ const omap3_sysinfo sysinfo = {
 #define REVISION_CX	0x6
 #define REVISION_C4	0x5
 #define REVISION_XM	0x0
+#define REVISION_XMC    0x2
+
 
 /*
  * IEN  - Input Enable

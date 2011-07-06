@@ -134,7 +134,8 @@ int misc_init_r(void)
 		setenv("mpurate", "720");
 		break;
 	case REVISION_XM:
-		printf("Beagle xM Rev A\n");
+	case REVISION_XMC:
+		printf("Beagle xM Rev A/C\n");
 		MUX_BEAGLE_XM();
 		/* Set VAUX2 to 1.8V for EHCI PHY */
 		twl4030_pmrecv_vsel_cfg(TWL4030_PM_RECEIVER_VAUX2_DEDICATED,
