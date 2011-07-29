@@ -89,6 +89,46 @@ u32 get_sysboot_value(void)
 	return mode;
 }
 
+/******************************************
+ * pg_val_ti816x() - runtime PG ver detect
+ ******************************************/
+u32 pg_val_ti816x(u32 pg1_val, u32 pg2_val)
+{
+	/* TI816X PG1.0 devices should read 0x0 as chip rev
+	 * TI816X PG1.1 devices should read 0x1 as chip rev
+	 */
+	if (0x1 == get_cpu_rev())
+		return pg2_val;
+	else
+		return pg1_val;
+}
+
+/***************************************************
+ * u32 pg_val_ti814x() - return the PG specifi value
+ ***************************************************/
+u32 pg_val_ti814x(u32 pg1_val, u32 pg2_val)
+{
+	/* PG2.1 devices should read 0x3 as chip rev */
+	if (PG2_1 == get_cpu_rev())
+		return pg2_val;
+	else
+		return pg1_val;
+}
+
+/************************************************************
+ * get_sysboot_bw(void) - return buswidth from CONTROL_STATUS
+ ************************************************************/
+u32 get_sysboot_bw(void)
+{
+	int bw;
+	bw = __raw_readl(CONTROL_STATUS) & (SYSBOOT_BW_MASK);
+	bw >>= SYSBOOT_BW_POS;
+	if (bw == 0)	/* 8-bit nand if BTMODE BW pin on board is ON */
+		return 1;
+	else if (bw == 1)/* 16-bit nand if BTMODE BW pin on board is OFF */
+		return 0;
+}
+
 #ifdef CONFIG_DISPLAY_CPUINFO
 /**
  * Print CPU information
