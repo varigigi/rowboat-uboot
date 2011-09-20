@@ -133,6 +133,7 @@ extern void cpsw_eth_set_mac_addr(const u_int8_t *addr);
 static unsigned char daughter_board_connected = FALSE;
 static volatile int board_id = BASE_BOARD;
 
+#ifdef CONFIG_AM335X_MIN_CONFIG
 static void init_timer(void)
 {
 	/* Reset the Timer */
@@ -144,6 +145,7 @@ static void init_timer(void)
 	/* Start the Timer */
 	__raw_writel(0x1, (DM_TIMER2_BASE + TCLR_REG));
 }
+#endif
 
 int dram_init(void)
 {
@@ -175,6 +177,8 @@ static void Data_Macro_Config(int dataMacroNum)
 		BaseAddrOffset = 0x00;
 	else if (dataMacroNum == 1)
 		BaseAddrOffset = 0xA4;
+	else
+		return;
 
 	__raw_writel(((DDR2_RD_DQS<<30)|(DDR2_RD_DQS<<20)
 			|(DDR2_RD_DQS<<10)|(DDR2_RD_DQS<<0)),
