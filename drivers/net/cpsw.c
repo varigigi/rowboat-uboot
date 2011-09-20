@@ -551,6 +551,14 @@ static void cpsw_set_slave_mac(struct cpsw_slave *slave,
 	__raw_writel(mac_lo(priv->dev->enetaddr), &slave->regs->sa_lo);
 }
 
+static inline u32 cpsw_get_slave_port(struct cpsw_priv *priv, u32 slave_num)
+{
+	if (priv->host_port == 0)
+		return slave_num + 1;
+	else
+		return slave_num;
+}
+
 static void cpsw_slave_update_link(struct cpsw_slave *slave,
 				   struct cpsw_priv *priv, int *link)
 {
@@ -559,11 +567,18 @@ static void cpsw_slave_update_link(struct cpsw_slave *slave,
 	int speed, duplex;
 	unsigned short reg;
 	u32 mac_control = 0;
+	u32 slave_port;
 
 	if (miiphy_read(name, phy_id, PHY_BMSR, &reg))
 		return; /* could not read, assume no link */
 
+	slave_port = cpsw_get_slave_port(priv, slave->slave_num);
+
 	if (reg & PHY_BMSR_LS) { /* link up */
+
+		/* enable forwarding */
+		cpsw_ale_port_state(priv, slave_port, ALE_PORT_STATE_FORWARD);
+
 		speed = miiphy_speed(name, phy_id);
 		duplex = miiphy_duplex(name, phy_id);
 
@@ -599,14 +614,6 @@ static int cpsw_update_link(struct cpsw_priv *priv)
 	return link;
 }
 
-static inline u32 cpsw_get_slave_port(struct cpsw_priv *priv, u32 slave_num)
-{
-	if (priv->host_port == 0)
-		return slave_num + 1;
-	else
-		return slave_num;
-}
-
 static void cpsw_slave_init(struct cpsw_slave *slave, struct cpsw_priv *priv)
 {
 	u32	slave_port;
@@ -622,9 +629,7 @@ static void cpsw_slave_init(struct cpsw_slave *slave, struct cpsw_priv *priv)
 
 	slave->mac_control = 0;	/* no link yet */
 
-	/* enable forwarding */
 	slave_port = cpsw_get_slave_port(priv, slave->slave_num);
-	cpsw_ale_port_state(priv, slave_port, ALE_PORT_STATE_FORWARD);
 
 	cpsw_ale_add_mcast(priv, NetBcastAddr, 1 << slave_port);
 
