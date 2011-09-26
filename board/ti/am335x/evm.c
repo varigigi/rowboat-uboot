@@ -1006,7 +1006,7 @@ int board_eth_init(bd_t *bis)
  * Command to switch between NAND HW and SW ecc
  *****************************************************************************/
 extern void ti81xx_nand_switch_ecc(nand_ecc_modes_t hardware, int32_t mode);
-static int do_switch_ecc(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
+int do_switch_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	int type = 0;
 	if (argc < 2)

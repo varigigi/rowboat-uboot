@@ -13,7 +13,12 @@
 #ifndef __CONFIG_AM335X_EVM_H
 #define __CONFIG_AM335X_EVM_H
 
+#include <asm/sizes.h>
+
 #define CONFIG_AM335X_HSMMC_INSTANCE	0	/* 0 - MMC0, 1 - MMC1 */
+
+/* Enable fastboot */
+#define CONFIG_FASTBOOT  1
 
 /* In the 1st stage we have just 110K, so cut down wherever possible */
 #ifdef CONFIG_AM335X_MIN_CONFIG
@@ -94,6 +99,66 @@
 #endif
 
 #define CONFIG_SPI			1
+
+/* USB
+ * Enable CONFIG_MUSB_HCD for Host functionalities MSC, keyboard
+ * Enable CONFIG_MUSB_UDC for Device functionalities.
+ */
+#define CONFIG_USB_AM335X                1
+
+/* #define CONFIG_MUSB_HCD                      1 */
+
+#define CONFIG_MUSB_UDC         1
+
+#ifdef CONFIG_USB_AM335X
+
+#ifdef CONFIG_MUSB_HCD
+#define CONFIG_CMD_USB
+
+#define CONFIG_USB_STORAGE
+#define CONGIG_CMD_STORAGE
+
+#ifdef CONFIG_USB_KEYBOARD
+#define CONFIG_SYS_USB_EVENT_POLL
+#define CONFIG_PREBOOT "usb start"
+#endif /* CONFIG_USB_KEYBOARD */
+
+#endif /* CONFIG_MUSB_HCD */
+
+#ifdef CONFIG_MUSB_UDC
+#ifdef CONFIG_FASTBOOT
+/* Fastboot settings
+ */
+/* Another macro may also be used or instead used to take care of the case
+ * where fastboot is started at boot (to be incorporated) based on key press
+ */
+#define PHYS_SDRAM_1               0x80800000
+#define CONFIG_CMD_FASTBOOT
+#define CONFIG_FASTBOOT_TRANSFER_BUFFER         (PHYS_SDRAM_1 + SZ_16M)
+#define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    (SZ_128M - SZ_16M)
+/* if already present, use already existing NAND macros for block & oob size */
+#define FASTBOOT_NAND_BLOCK_SIZE                2048
+#define FASTBOOT_NAND_OOB_SIZE                  64
+/* Fastboot product name */
+#define FASTBOOT_PRODUCT_NAME   "am335xevm"
+/* Use HS */
+#define USB_BCD_VERSION                 0x0200
+#else
+/* USB device configuration */
+#define CONFIG_USB_TTY                  1
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV    1
+#endif /* CONFIG_FASTBOOT */
+#define CONFIG_USB_DEVICE               1
+/* Change these to suit your needs */
+#define CONFIG_USBD_VENDORID            0x0451
+#define CONFIG_USBD_PRODUCTID           0x5678
+#define CONFIG_USBD_MANUFACTURER        "Texas Instruments"
+#define CONFIG_USBD_PRODUCT_NAME        "EVM"
+#endif /* CONFIG_MUSB_UDC */
+
+#endif /* CONFIG_USB_AM335X */
+
+/* commands to include */
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"verify=yes\0" \

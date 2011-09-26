@@ -59,6 +59,8 @@
 #include "omap3.h"
 #elif defined(CONFIG_USB_AM35X)
 #include "am35x.h"
+#elif defined(CONFIG_USB_AM335X)
+#include "am335x.h"
 #elif defined(CONFIG_USB_DAVINCI)
 #include "davinci.h"
 #endif
@@ -96,6 +98,10 @@ do {									\
 
 #ifdef	CONFIG_USB_AM35X
 extern struct am35x_usb_regs *regs;
+#endif
+
+#ifdef	CONFIG_USB_AM335X
+extern struct am335x_usb_regs *regs;
 #endif
 
 /* static implies these initialized to 0 or NULL */
@@ -793,12 +799,18 @@ void udc_irq(void)
 
 		if (ep0_state != SET_ADDRESS) {
 			u16 intrrx, intrtx;
-#ifdef	CONFIG_USB_AM35X
 			u32 intr_ep;
 
+#ifdef	CONFIG_USB_AM35X
 			/* Read TI registers for AM35X, not MUSB registers */
 			intr_ep = regs->ep_intsrc;
 			regs->ep_intsrcclr = intr_ep;
+			intrrx = (intr_ep & 0xFFFE0000) >> 16;
+			intrtx = intr_ep & 0xFFFF;
+#elif defined(CONFIG_USB_AM335X)
+			/* Read TI registers for AM35X, not MUSB registers */
+			intr_ep = regs->irq_status0;
+			regs->irq_status0 = intr_ep;
 			intrrx = (intr_ep & 0xFFFE0000) >> 16;
 			intrtx = intr_ep & 0xFFFF;
 #else
