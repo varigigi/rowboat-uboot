@@ -867,10 +867,10 @@ static void phy_init(char *name, int addr)
 	}
 	miiphy_read(name, addr, PHY_BMCR, &val);
 
-	/* Setup GIG advertisement only if it is not IA board */
+	/* TODO: Disable GIG advertisement for the time being */
 	if (board_id != IA_BOARD) {
 		miiphy_read(name, addr, PHY_1000BTCR, &val);
-		val |= PHY_1000BTCR_1000FD;
+		val &= ~PHY_1000BTCR_1000FD;
 		val &= ~PHY_1000BTCR_1000HD;
 		miiphy_write(name, addr, PHY_1000BTCR, val);
 		miiphy_read(name, addr, PHY_1000BTCR, &val);
