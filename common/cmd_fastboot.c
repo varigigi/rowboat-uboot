@@ -244,14 +244,12 @@ static struct cmd_fastboot_interface priv =
 
 static int fbt_init_endpoints (void);
 
-extern int do_reset(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 #ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 /* Use do_bootm and do_go for fastboot's 'boot' command */
-extern int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 extern int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
-/* Use do_setenv and do_saveenv to permenantly save data */
-extern int do_saveenv (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
-extern int do_setenv ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+/* Use do_env_set and do_env_save to permenantly save data */
+extern int do_env_save (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+extern int do_env_set ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 extern int do_switch_ecc(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
 extern int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
 extern fastboot_ptentry ptn[];
@@ -580,7 +578,7 @@ static void set_env(char *var, char *val)
 	setenv[1] = var;
 	setenv[2] = val;
 
-	do_setenv(NULL, 0, 3, setenv);
+	do_env_set(NULL, 0, 3, setenv);
 }
 
 static void save_env(struct fastboot_ptentry *ptn,
@@ -606,7 +604,7 @@ static void save_env(struct fastboot_ptentry *ptn,
 		sprintf(ecc_type, "sw");
 		do_switch_ecc(NULL, 0, 2, ecc);
 	}
-	do_saveenv(NULL, 0, 1, saveenv);
+	do_env_save(NULL, 0, 1, saveenv);
 }
 
 static void save_block_values(struct fastboot_ptentry *ptn,
@@ -632,11 +630,11 @@ static void save_block_values(struct fastboot_ptentry *ptn,
 
 		sprintf (var, "%s_nand_offset", ptn->name);
 		sprintf (val, "");
-		do_setenv (NULL, 0, 3, setenv);
+		do_env_set (NULL, 0, 3, setenv);
 
 		sprintf (var, "%s_nand_size", ptn->name);
 		sprintf (val, "");
-		do_setenv (NULL, 0, 3, setenv);
+		do_env_set (NULL, 0, 3, setenv);
 	} else {
 		/* Normal case */
 
@@ -645,7 +643,7 @@ static void save_block_values(struct fastboot_ptentry *ptn,
 
 		FBTINFO("%s %s %s\n", setenv[0], setenv[1], setenv[2]);
 
-		do_setenv (NULL, 0, 3, setenv);
+		do_env_set (NULL, 0, 3, setenv);
 
 		sprintf(var, "%s_nand_size", ptn->name);
 
@@ -653,7 +651,7 @@ static void save_block_values(struct fastboot_ptentry *ptn,
 
 		FBTINFO("%s %s %s\n", setenv[0], setenv[1], setenv[2]);
 
-		do_setenv (NULL, 0, 3, setenv);
+		do_env_set (NULL, 0, 3, setenv);
 	}
 
 
@@ -690,7 +688,7 @@ static void save_block_values(struct fastboot_ptentry *ptn,
 
 	}
 
-	do_saveenv (NULL, 0, 1, saveenv);
+	do_env_save (NULL, 0, 1, saveenv);
 }
 
 /* When save = 0, just parse.  The input is unchanged
