@@ -684,10 +684,10 @@ int board_init(void)
 err_out:
 	/*
 	 * When we cannot use the EEPROM to determine what board we
-	 * are we assume BeagleBone currently as we have not yet
+	 * are we assume GPEVM currently as we have not yet
 	 * programmed the EEPROMs.
 	 */
-	board_id = BONE_BOARD;
+	board_id = GP_BOARD;
 	profile = 1;	/* profile 0 is internally considered as 1 */
 	daughter_board_connected = 1;
 	configure_evm_pin_mux(board_id, header.version, profile, daughter_board_connected);
