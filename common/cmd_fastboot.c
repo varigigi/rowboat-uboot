@@ -250,7 +250,8 @@ extern int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 /* Use do_env_set and do_env_save to permenantly save data */
 extern int do_env_save (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 extern int do_env_set ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
-extern int do_switch_ecc(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
+extern int do_switch_ecc(cmd_tbl_t *cmdtp, int flag, int argc,
+					   char *const argv[]);
 extern int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
 extern fastboot_ptentry ptn[];
 
@@ -541,7 +542,6 @@ void fastboot_flash_dump_ptn(void)
                 n, ptn->name, ptn->start, ptn->length);
     }
 }
-
 
 fastboot_ptentry *fastboot_flash_find_ptn(const char *name)
 {
@@ -877,16 +877,23 @@ static int saveenv_to_ptn(struct fastboot_ptentry *ptn, char *err_string)
 static void set_ptn_ecc(struct fastboot_ptentry *ptn)
 {
 	char ecc_type[5];
+	char ecc_subtype[2];
 	char *ecc[3] = {"nandecc", "sw", NULL, };
 
 	/* Some flashing requires the nand's ecc to be set */
 	ecc[1] = ecc_type;
-	if ((ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC) &&
-	    (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC)) {
+	ecc[2] = ecc_subtype;
+	if (((ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC)  ||
+	     (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC)) &&
+	     (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC)) {
 		/* Both can not be true */
 		FBTERR("can not do hw and sw ecc for partition '%s'\n",
 		       ptn->name);
 		FBTERR("Ignoring these flags\n");
+	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC) {
+		sprintf(ecc_type, "hw");
+		sprintf(ecc_subtype, "2");
+		do_switch_ecc(NULL, 0, 3, ecc);
 	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC) {
 		sprintf(ecc_type, "hw");
 		do_switch_ecc(NULL, 0, 2, ecc);

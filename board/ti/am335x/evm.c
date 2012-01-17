@@ -36,6 +36,7 @@
 #include "tps65217.h"
 #include <i2c.h>
 #include <serial.h>
+#include <fastboot.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -118,6 +119,57 @@ struct am335x_baseboard_id {
 	char config[32];
 	char mac_addr[NO_OF_MAC_ADDR][ETH_ALEN];
 };
+
+#ifdef CONFIG_CMD_FASTBOOT
+#ifdef FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
+
+#define MAX_PTN                 5
+
+/* Initialize the name of fastboot flash name mappings */
+fastboot_ptentry ptn[MAX_PTN] = {
+	{
+		.name   = "spl",
+		.start  = 0x0000000,
+		.length = 0x0020000, /* 128 K */
+		/* Written into the first 4 0x20000 blocks
+		   Use HW ECC */
+		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_I |
+			  FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC |
+			  FASTBOOT_PTENTRY_FLAGS_REPEAT_4,
+	},
+	{
+		.name   = "uboot",
+		.start  = 0x0080000,
+		.length = 0x01E0000, /* 1.875 M */
+		/* Skip bad blocks on write
+		   Use HW ECC */
+		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_I |
+			  FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC,
+	},
+	{
+		.name   = "environment",
+		.start  = MNAND_ENV_OFFSET,  /* set in config file */
+		.length = 0x0020000,
+		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_ENV |
+			  FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC,
+	},
+	{
+		.name   = "kernel",
+		.start  = 0x0280000,
+		.length = 0x0500000, /* 5 M */
+		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_I |
+			  FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC,
+	},
+	{
+		.name   = "filesystem",
+		.start  = 0x0780000,
+		.length = 0xF880000, /* 248.5 M */
+		.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_I |
+			  FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC,
+	},
+};
+#endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
+#endif /* CONFIG_FASTBOOT */
 
 static struct am335x_baseboard_id header;
 extern void cpsw_eth_set_mac_addr(const u_int8_t *addr);
@@ -703,6 +755,15 @@ int board_init(void)
 #endif
 
 	gpmc_init();
+
+#ifdef CONFIG_CMD_FASTBOOT
+#ifdef FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
+	int indx;
+
+	for (indx = 0; indx < MAX_PTN; indx++)
+		fastboot_flash_add_ptn(&ptn[indx]);
+#endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
+#endif /* CONFIG_FASTBOOT */
 
 	return 0;
 

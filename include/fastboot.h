@@ -206,23 +206,35 @@ struct fastboot_ptentry{
    NEXT_GOOD_BLOCK and CONTIGOUS_BLOCK can not both be set */
 #define FASTBOOT_PTENTRY_FLAGS_WRITE_CONTIGUOUS_BLOCK 0x00000020
 
-/* Sets the ECC to hardware before writing
-   HW and SW ECC should not both be set. */
-#define FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC           0x00000040
-
 /* Sets the ECC to software before writing
    HW and SW ECC should not both be set. */
-#define FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC           0x00000080
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC           0x00000040
+
+/* Sets the ECC to hardware before writing
+   HW and SW ECC should not both be set. */
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC           0x00000080
+
+/* Sets the ECC to hardware before writing
+   HW and SW ECC should not both be set. */
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH4_ECC      0x00000100
+
+/* Sets the ECC to hardware before writing
+   HW and SW ECC should not both be set. */
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH8_ECC      0x00000200
+
+/* Sets the ECC to hardware before writing
+   HW and SW ECC should not both be set. */
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_HW_BCH16_ECC     0x00000400
 
 /* Write the file with write.i */
-#define FASTBOOT_PTENTRY_FLAGS_WRITE_I                0x00000100
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_I                0x00000800
 
 /* Write the file with write.jffs2 */
-#define FASTBOOT_PTENTRY_FLAGS_WRITE_JFFS2	0x00000200
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_JFFS2            0x00001000
 
 /* Write the file as a series of variable/value pairs
    using the setenv and saveenv commands */
-#define FASTBOOT_PTENTRY_FLAGS_WRITE_ENV              0x00000400
+#define FASTBOOT_PTENTRY_FLAGS_WRITE_ENV              0x00002000
 
 /* Status values */
 #define FASTBOOT_OK			0
@@ -231,10 +243,10 @@ struct fastboot_ptentry{
 #define FASTBOOT_INACTIVE		2
 
 /* Android bootimage file format */
-#define FASTBOOT_BOOT_MAGIC "ANDROID!"
-#define FASTBOOT_BOOT_MAGIC_SIZE 8
-#define FASTBOOT_BOOT_NAME_SIZE 16
-#define FASTBOOT_BOOT_ARGS_SIZE 512
+#define FASTBOOT_BOOT_MAGIC            "ANDROID!"
+#define FASTBOOT_BOOT_MAGIC_SIZE       8
+#define FASTBOOT_BOOT_NAME_SIZE        16
+#define FASTBOOT_BOOT_ARGS_SIZE        512
 
 struct fastboot_boot_img_hdr {
 	unsigned char magic[FASTBOOT_BOOT_MAGIC_SIZE];
