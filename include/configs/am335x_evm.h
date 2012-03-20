@@ -22,8 +22,6 @@
 #include <asm/arch/hardware.h>
 #include <asm/sizes.h>
 
-#define CONFIG_AM335X_HSMMC_INSTANCE	0	/* 0 - MMC0, 1 - MMC1 */
-
 /* Enable fastboot */
 #define CONFIG_FASTBOOT  1
 
@@ -459,11 +457,6 @@
 
 /* HSMMC support */
 #ifdef CONFIG_MMC
-#if (CONFIG_AM335X_HSMMC_INSTANCE == 0)
-#define CONFIG_AM335X_HSMMC_BASE	0x48060100
-#else
-#define CONFIG_AM335X_HSMMC_BASE	0x481D8100
-#endif
 #define CONFIG_GENERIC_MMC
 #define CONFIG_OMAP_HSMMC
 #define CONFIG_CMD_MMC
