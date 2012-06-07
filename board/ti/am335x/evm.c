@@ -1090,7 +1090,7 @@ static void evm_phy_init(char *name, int addr)
 	} while (cntr < 250);
 
 	if (cntr >= 250)
-		printf("Auto negotitation failed\n");
+		printf("Auto Negotitation failed for port %d\n", addr);
 
 	return;
 }
