@@ -886,6 +886,7 @@ int board_init(void)
 
 	gpmc_init();
 
+#ifndef CONFIG_SPL_BUILD
 #ifdef CONFIG_CMD_FASTBOOT
 #ifdef FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 	int indx;
@@ -894,6 +895,7 @@ int board_init(void)
 		fastboot_flash_add_ptn(&ptn[indx]);
 #endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
 #endif /* CONFIG_FASTBOOT */
+#endif /* CONFIG_SPL_BUILD */
 
 	return 0;
 
