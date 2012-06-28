@@ -43,9 +43,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG		/* Required for ramdisk support */
 
-/* set to negative value for no autoboot */
-#define CONFIG_BOOTDELAY		3
-
 #define CONFIG_MMC
 #define CONFIG_NAND
 #define CONFIG_SPI
@@ -191,6 +188,10 @@
 		"run net_args; " \
 		"bootm ${kloadaddr}\0" \
 
+#ifndef CONFIG_RESTORE_FLASH
+/* set to negative value for no autoboot */
+#define CONFIG_BOOTDELAY		3
+
 #define CONFIG_BOOTCOMMAND \
 	"if mmc rescan; then " \
 		"echo SD/MMC found on device ${mmc_dev};" \
@@ -208,6 +209,17 @@
 		"fi;" \
 	"fi;" \
 	"run nand_boot;" \
+
+#else
+#define CONFIG_BOOTDELAY		0
+
+#define CONFIG_BOOTCOMMAND			\
+	"setenv autoload no; "			\
+	"dhcp; "				\
+	"if tftp 80000000 debrick.scr; then "	\
+		"source 80000000; "		\
+	"fi"
+#endif
 
 #define CONFIG_MISC_INIT_R
 #define CONFIG_SYS_AUTOLOAD		"yes"
