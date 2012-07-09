@@ -27,6 +27,12 @@
 /* Enable fastboot */
 #define CONFIG_FASTBOOT  1
 
+/*
+ * Enables Fastboot eMMC boot support.
+ * Disable FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING in include/fastboot.h before enabling this macro
+ */
+/*#define CONFIG_STORAGE_EMMC   1*/
+
 #include <config_cmd_default.h>
 
 #define CONFIG_CMD_ASKENV
@@ -82,7 +88,11 @@
 #define PHYS_SDRAM_1               0x80800000
 #define CONFIG_CMD_FASTBOOT
 #define CONFIG_FASTBOOT_TRANSFER_BUFFER         (PHYS_SDRAM_1 + SZ_16M)
-#define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    SZ_128M
+
+/* The buffer size is fixed to 192MB for a 256MB RAM, and it can be increased
+to a higher value if a higher sized RAM support is available in Hardware */
+#define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE    (SZ_256M - SZ_64M)
+
 /* if already present, use already existing NAND macros for block & oob size */
 #define FASTBOOT_NAND_BLOCK_SIZE                2048
 #define FASTBOOT_NAND_OOB_SIZE                  64
@@ -192,6 +202,9 @@
 /* set to negative value for no autoboot */
 #define CONFIG_BOOTDELAY		3
 
+#ifdef CONFIG_STORAGE_EMMC
+#define CONFIG_BOOTCOMMAND "booti mmc0"
+#else
 #define CONFIG_BOOTCOMMAND \
 	"if mmc rescan; then " \
 		"echo SD/MMC found on device ${mmc_dev};" \
@@ -209,6 +222,8 @@
 		"fi;" \
 	"fi;" \
 	"run nand_boot;" \
+
+#endif
 
 #else
 #define CONFIG_BOOTDELAY		0
@@ -268,7 +283,11 @@
 #define CONFIG_SPL_BSS_MAX_SIZE		0x80000		/* 512 KB */
 
 #ifndef CONFIG_SPI_BOOT
+#ifdef CONFIG_STORAGE_EMMC
+#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x200
+#else
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300 /* address 0x60000 */
+#endif
 #define CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS	0x200 /* 256 KB */
 #define CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION	1
 #define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"u-boot.img"
@@ -488,6 +507,9 @@
 #define CONFIG_OMAP_HSMMC
 #define CONFIG_CMD_MMC
 #define CONFIG_DOS_PARTITION
+#ifndef CONFIG_SPL_BUILD	/* Since EFI partition code is required only in u-boot  */
+#define CONFIG_EFI_PARTITION   1
+#endif
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_EXT2
 #endif
