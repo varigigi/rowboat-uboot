@@ -101,8 +101,14 @@ static void mmc_load_image_fat(struct mmc *mmc)
 
 	err = file_fat_read(CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME,
 				(u8 *)header, sizeof(struct image_header));
-	if (err <= 0)
-		goto end;
+	if (err <= 0) {
+		printf("spl: error reading image %s in FAT mode, err - %d\n",
+			CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME, err);
+		printf("spl: Reading image in RAW mode\n");
+		mmc_load_image_raw(mmc);
+
+		return;
+	}
 
 	spl_parse_image_header(header);
 
