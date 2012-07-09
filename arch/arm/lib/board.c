@@ -73,6 +73,10 @@ extern void dataflash_print_info(void);
 extern void rtl8019_get_enetaddr (uchar * addr);
 #endif
 
+#if defined(CONFIG_STORAGE_EMMC)
+extern int board_mmc_fbtptn_init(void);
+#endif
+
 #if defined(CONFIG_HARD_I2C) || \
     defined(CONFIG_SOFT_I2C)
 #include <i2c.h>
@@ -517,6 +521,11 @@ void board_init_r(gd_t *id, ulong dest_addr)
        puts("MMC:   ");
        mmc_initialize(bd);
 #endif
+
+#if defined(CONFIG_STORAGE_EMMC)
+	board_mmc_fbtptn_init();
+	puts("Loaded eMMC partition table");
+#endif /* CONFIG_STORAGE_EMMC */
 
 #ifdef CONFIG_HAS_DATAFLASH
 	AT91F_DataflashInit();

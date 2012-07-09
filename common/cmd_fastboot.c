@@ -98,6 +98,10 @@
 #include <environment.h>
 #endif
 
+#ifdef CONFIG_STORAGE_EMMC
+#include <environment.h>
+#endif
+
 /* USB specific */
 
 #include <usb_defs.h>
@@ -253,6 +257,10 @@ extern int do_env_set ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 extern int do_switch_ecc(cmd_tbl_t *cmdtp, int flag, int argc,
 					   char *const argv[]);
 extern int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
+#elif defined(CONFIG_STORAGE_EMMC)
+extern int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+extern env_t *env_ptr;
+#endif  /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
 extern fastboot_ptentry ptn[];
 
 /* To support the Android-style naming of flash */
@@ -260,7 +268,6 @@ extern fastboot_ptentry ptn[];
 static fastboot_ptentry ptable[MAX_PTN];
 static unsigned int pcount;
 static int static_pcount = -1;
-#endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
 
 /* USB specific */
 
@@ -522,9 +529,14 @@ static struct urb *next_urb (struct usb_device_instance *device,
 
 /* FASBOOT specific */
 
-#ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 /*
  * Android style flash utilties */
+void fastboot_flash_reset_ptn(void)
+{
+	FBTINFO("fastboot flash reset partition..!!");
+	pcount = 0;
+}
+
 void fastboot_flash_add_ptn(fastboot_ptentry *ptn)
 {
     if(pcount < MAX_PTN){
@@ -581,6 +593,7 @@ static void set_env(char *var, char *val)
 	do_env_set(NULL, 0, 3, setenv);
 }
 
+#ifdef FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 static void save_env(struct fastboot_ptentry *ptn,
 		     char *var, char *val)
 {
@@ -1450,6 +1463,130 @@ static int fbt_handle_flash(char *cmdbuf)
 }
 #endif /* FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING */
 
+#ifdef CONFIG_STORAGE_EMMC
+static int fbt_handle_erase_emmc(char *cmdbuf)
+{
+	struct fastboot_ptentry *ptn;
+	int status = 0;
+
+	/* Find the partition and erase it */
+	ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+
+	if (ptn == 0) {
+		sprintf(priv.response, "FAIL: partition doesn't exist");
+	} else {
+		/* Call MMC erase function here */
+		char start[32], length[32];
+		char *erase[4]  = { "mmc", "erase", NULL, NULL, };
+		char *mmc_init[2] = {"mmc", "rescan",};
+
+		erase[2] = start;
+		erase[3] = length;
+
+		sprintf(length, "0x%x", ptn->length);
+		sprintf(start, "0x%x", ptn->start);
+
+		printf("Initializing '%s'\n", ptn->name);
+		if (do_mmcops(NULL, 0, 2, mmc_init))
+			sprintf(priv.response, "FAIL: Init of MMC card");
+		else
+			sprintf(priv.response, "OKAY");
+
+		printf("Erasing '%s'\n", ptn->name);
+		if (do_mmcops(NULL, 0, 5, erase)) {
+			printf("Erasing '%s' FAILED!\n", ptn->name);
+			sprintf(priv.response, "FAIL: Erase partition");
+		} else {
+			printf("Erasing '%s' DONE!\n", ptn->name);
+			sprintf(priv.response, "OKAY");
+		}
+	}
+
+	return status;
+}
+
+static int fbt_handle_flash_emmc(char *cmdbuf)
+{
+	int status = 0;
+
+	if (priv.d_bytes) {
+		struct fastboot_ptentry *ptn;
+
+		/* Next is the partition name */
+		ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+
+		if (ptn == 0) {
+			printf("Partition:[%s] does not exist\n", cmdbuf+6);
+			sprintf(priv.response, "FAILpartition does not exist");
+		} else if ((priv.d_bytes > ptn->length) &&
+					!(ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV)) {
+			printf("Image too large for the partition\n");
+			sprintf(priv.response, "FAILimage too large for partition");
+		} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV) {
+			/* Check if this is not really a flash write,
+			 * but instead a saveenv
+			 */
+			unsigned int i = 0;
+			/* Env file is expected with a NULL delimeter between
+			 * env variables So replace New line Feeds (0x0a) with
+			 * NULL (0x00)
+			 */
+			for (i = 0; i < priv.d_bytes; i++) {
+				if (priv.transfer_buffer[i] == 0x0a)
+					priv.transfer_buffer[i] = 0x00;
+			}
+			memset(env_ptr->data, 0, ENV_SIZE);
+			memcpy(env_ptr->data, priv.transfer_buffer, priv.d_bytes);
+			do_env_save(NULL, 0, 1, NULL);
+			printf("saveenv to '%s' DONE!\n", ptn->name);
+			sprintf(priv.response, "OKAY");
+		} else {
+			/* Normal case */
+			char source[32], dest[32], length[32];
+			source[0] = '\0';
+			dest[0] = '\0';
+			length[0] = '\0';
+
+			printf("writing to partition '%s'\n", ptn->name);
+			char *mmc_write[5]  = {"mmc", "write", NULL, NULL, NULL};
+			char *mmc_init[2] = {"mmc", "rescan",};
+
+			mmc_write[2] = source;
+			mmc_write[3] = dest;
+			mmc_write[4] = length;
+
+			sprintf(source, "0x%x", priv.transfer_buffer);
+			sprintf(dest, "0x%x", ptn->start);
+			sprintf(length, "0x%x", (priv.d_bytes/512)+1);
+
+			printf("Initializing '%s'\n", ptn->name);
+			if (do_mmcops(NULL, 0, 2, mmc_init))
+				sprintf(priv.response, "FAIL:Init of MMC card");
+			else
+				sprintf(priv.response, "OKAY");
+
+			printf("Writing '%s'\n", ptn->name);
+			if (do_mmcops(NULL, 0, 5, mmc_write)) {
+				printf("Writing '%s' FAILED!\n", ptn->name);
+				sprintf(priv.response, "FAIL: Write partition");
+			} else {
+				printf("Writing '%s' DONE!\n", ptn->name);
+				sprintf(priv.response, "OKAY");
+			}
+		}
+	} else {
+		sprintf(priv.response, "FAILno image downloaded");
+	}
+
+	return status;
+}
+
+static int fbt_handle_boot_emmc(char *cmdbuf)
+{
+	return 0;
+}
+#endif /* CONFIG_STORAGE_EMMC */
+
 static int fbt_handle_getvar(char *cmdbuf)
 {
 	strcpy(priv.response, "OKAY");
@@ -1680,10 +1817,22 @@ static int fbt_rx_process(unsigned char *buffer, int length)
 			fbt_handle_getvar(cmdbuf);
 		}
 
+		if (memcmp(cmdbuf, "oem ", 4) == 0) {
+			FBTINFO("calling fastboot oem!!");
+			int r = fastboot_oem(cmdbuf + 4);
+			if (r < 0) {
+				strcpy(priv.response, "FAIL");
+			} else {
+				strcpy(priv.response, "OKAY");
+			}
+		}
+
 		if(memcmp(cmdbuf, "erase:", 6) == 0) {
 			FBTDBG("erase\n");
 #ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 			fbt_handle_erase(cmdbuf);
+#elif defined(CONFIG_STORAGE_EMMC)
+			fbt_handle_erase_emmc(cmdbuf);
 #endif
 		}
 
@@ -1691,6 +1840,8 @@ static int fbt_rx_process(unsigned char *buffer, int length)
 			FBTDBG("flash\n");
 #ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 			fbt_handle_flash(cmdbuf);
+#elif defined(CONFIG_STORAGE_EMMC)
+			fbt_handle_flash_emmc(cmdbuf);
 #endif
 		}
 
@@ -1710,6 +1861,8 @@ static int fbt_rx_process(unsigned char *buffer, int length)
 			FBTDBG("boot\n");
 #ifdef	FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 			fbt_handle_boot(cmdbuf);
+#elif defined(CONFIG_STORAGE_EMMC)
+			fbt_handle_boot_emmc(cmdbuf);
 #endif
 		}
 
