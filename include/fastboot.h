@@ -98,8 +98,6 @@
 #define	FASTBOOT_FLAG_RESPONSE	1
 #define	FASTBOOT_FLAG_DOWNLOAD	1
 
-/* To change design of memory handling (SD/MMC, NAND) faster, if required */
-#define FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
 /* To activate-deactivate fastboot upload command (not part of OmapZoom) */
 // #define	FASTBOOT_UPLOAD
 

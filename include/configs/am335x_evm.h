@@ -27,11 +27,15 @@
 /* Enable fastboot */
 #define CONFIG_FASTBOOT  1
 
-/*
- * Enables Fastboot eMMC boot support.
- * Disable FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING in include/fastboot.h before enabling this macro
- */
-/*#define CONFIG_STORAGE_EMMC   1*/
+/* Enables Fastboot to NAND */
+#define FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING
+
+/* Enables Fastboot to eMMC */
+/*#define CONFIG_STORAGE_EMMC*/
+
+#if defined(FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING) && defined(CONFIG_STORAGE_EMMC)
+#error "Select either CONFIG_STORAGE_EMMC or FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING"
+#endif
 
 #include <config_cmd_default.h>
 
