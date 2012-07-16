@@ -26,6 +26,12 @@
 #include <mmc.h>
 
 static int curr_device = -1;
+
+int get_mmc_cur_dev(void)
+{
+	return curr_device;
+}
+
 #ifndef CONFIG_GENERIC_MMC
 int do_mmc (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {

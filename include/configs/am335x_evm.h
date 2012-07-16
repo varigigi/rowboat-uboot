@@ -37,6 +37,23 @@
 #error "Select either CONFIG_STORAGE_EMMC or FASTBOOT_PORT_OMAPZOOM_NAND_FLASHING"
 #endif
 
+#ifdef CONFIG_STORAGE_EMMC
+
+/* Enable below MACRO to use MMC0 as the boot device, for eMMC raw boot */
+#define CONFIG_USE_MMC0
+/* Enable below MACRO to use MMC1 as the boot device, for eMMC raw boot */
+/*#define CONFIG_USE_MMC1*/
+
+#ifdef CONFIG_USE_MMC0
+#undef CONFIG_USE_MMC1
+#endif
+
+#ifdef CONFIG_USE_MMC1
+#undef CONFIG_USE_MMC0
+#endif
+
+#endif
+
 #include <config_cmd_default.h>
 
 #define CONFIG_CMD_ASKENV
@@ -207,7 +224,12 @@ to a higher value if a higher sized RAM support is available in Hardware */
 #define CONFIG_BOOTDELAY		3
 
 #ifdef CONFIG_STORAGE_EMMC
+#ifdef CONFIG_USE_MMC0
 #define CONFIG_BOOTCOMMAND "booti mmc0"
+#endif
+#ifdef CONFIG_USE_MMC1
+#define CONFIG_BOOTCOMMAND "booti mmc1"
+#endif
 #else
 #define CONFIG_BOOTCOMMAND \
 	"if mmc rescan; then " \

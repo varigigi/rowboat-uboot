@@ -74,6 +74,7 @@ extern void rtl8019_get_enetaddr (uchar * addr);
 #endif
 
 #if defined(CONFIG_STORAGE_EMMC)
+extern int board_select_mmc(void);
 extern int board_mmc_fbtptn_init(void);
 #endif
 
@@ -523,6 +524,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 
 #if defined(CONFIG_STORAGE_EMMC)
+	board_select_mmc();
 	board_mmc_fbtptn_init();
 	puts("Loaded eMMC partition table");
 #endif /* CONFIG_STORAGE_EMMC */

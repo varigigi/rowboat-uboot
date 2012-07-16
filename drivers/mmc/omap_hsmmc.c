@@ -480,6 +480,9 @@ int omap_mmc_init(int dev_index)
 		mmc->b_max = 1;
 #endif
 
+	/* Provide the current MMC device index before registering */
+	/* It helps in retrieving the current device information */
+	mmc->block_dev.dev = dev_index;
 	mmc_register(mmc);
 
 	return 0;

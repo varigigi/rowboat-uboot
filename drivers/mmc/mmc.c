@@ -1153,7 +1153,8 @@ int mmc_register(struct mmc *mmc)
 {
 	/* Setup the universal parts of the block interface just once */
 	mmc->block_dev.if_type = IF_TYPE_MMC;
-	mmc->block_dev.dev = cur_dev_num++;
+	/* Increment the index for total number of MMC devices registered */
+	cur_dev_num++;
 	mmc->block_dev.removable = 1;
 	mmc->block_dev.block_read = mmc_bread;
 	mmc->block_dev.block_write = mmc_bwrite;

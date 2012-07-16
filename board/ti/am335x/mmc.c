@@ -283,7 +283,7 @@ static int do_format(void)
 
 	printf("\ndo_format ..!!");
 	/* get mmc info */
-	struct mmc *mmc = find_mmc_device(0);
+	struct mmc *mmc = find_mmc_device(get_mmc_cur_dev());
 	if (mmc == 0) {
 		printf("no mmc device at slot 0");
 		return -1;
@@ -356,9 +356,25 @@ int fastboot_oem(const char *cmd)
 	return -1;
 }
 
+void board_select_mmc(void)
+{
+	char *mmc_sel[3] = {"mmc", "dev", "0",};
+#ifdef CONFIG_USE_MMC0
+	mmc_sel[2] = "0";
+#endif
+#ifdef CONFIG_USE_MMC1
+	mmc_sel[2] = "1";
+#endif
+
+	if (do_mmcops(NULL, 0, 3, mmc_sel)) {
+		printf("FAIL: Unable to select MMC device\n");
+	}
+}
+
 int board_mmc_fbtptn_init(void)
 {
 	char *mmc_init[2] = {"mmc", "rescan",};
+
 	if (do_mmcops(NULL, 0, 2, mmc_init)) {
 		printf("FAIL:Init of MMC card");
 		return 1;

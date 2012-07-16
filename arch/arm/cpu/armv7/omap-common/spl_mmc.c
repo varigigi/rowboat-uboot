@@ -54,12 +54,22 @@ static void mmc_load_image_raw(struct mmc *mmc)
 {
 	u32 image_size_sectors, err;
 	const struct image_header *header;
+	u32 boot_dev;
 
 	header = (struct image_header *)(CONFIG_SYS_TEXT_BASE -
 						sizeof(struct image_header));
 
+	switch (omap_boot_device()) {
+		case BOOT_DEVICE_MMC1:
+			boot_dev = 0;
+			break;
+		case BOOT_DEVICE_MMC2:
+			boot_dev = 1;
+			break;
+	}
+
 	/* read image header to find the image size & load address */
-	err = mmc->block_dev.block_read(0,
+	err = mmc->block_dev.block_read(boot_dev,
 			CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR, 1,
 			(void *)header);
 
@@ -73,7 +83,7 @@ static void mmc_load_image_raw(struct mmc *mmc)
 				MMCSD_SECTOR_SIZE;
 
 	/* Read the header too to avoid extra memcpy */
-	err = mmc->block_dev.block_read(0,
+	err = mmc->block_dev.block_read(boot_dev,
 			CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR,
 			image_size_sectors, (void *)spl_image.load_addr);
 
@@ -127,11 +137,22 @@ void spl_mmc_load_image(void)
 {
 	struct mmc *mmc;
 	int err;
+	u32 boot_dev;
 	u32 boot_mode;
 
 	mmc_initialize(gd->bd);
+
+	switch (omap_boot_device()) {
+		case BOOT_DEVICE_MMC1:
+			boot_dev = 0;
+			break;
+		case BOOT_DEVICE_MMC2:
+			boot_dev = 1;
+			break;
+	}
+
 	/* We register only one device. So, the dev id is always 0 */
-	mmc = find_mmc_device(0);
+	mmc = find_mmc_device(boot_dev);
 	if (!mmc) {
 		puts("spl: mmc device not found!!\n");
 		hang();

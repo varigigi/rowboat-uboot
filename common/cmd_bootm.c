@@ -1580,6 +1580,16 @@ int do_booti(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		struct fastboot_ptentry *pte;
 		unsigned sector;
 
+		char *mmc_sel[3] = {"mmc", "dev", "0",};
+		if (mmcc == 0)
+			mmc_sel[2] = "0";
+		else if (mmcc == 1)
+			mmc_sel[2] = "1";
+
+		if (do_mmcops(NULL, 0, 3, mmc_sel)) {
+			printf("FAIL: Unable to select MMC device\n");
+		}
+
 		pte = fastboot_flash_find_ptn(ptn);
 		if (!pte) {
 			printf("booti: cannot find '%s' partition\n", ptn);
