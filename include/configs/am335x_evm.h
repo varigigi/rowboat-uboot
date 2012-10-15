@@ -554,11 +554,14 @@ to a higher value if a higher sized RAM support is available in Hardware */
 /*
  * USB configuration
  */
+/* Disable as conflicts with USB Fastboot feature*/
+/*
 #define CONFIG_USB_AM335X
 #define CONFIG_MUSB_GADGET
 #define CONFIG_MUSB_GADGET_PORT0
 #define CONFIG_MUSB_PIO_ONLY
 #define CONFIG_USB_GADGET_DUALSPEED
+*/
 
 #ifdef CONFIG_MUSB_GADGET
 #define CONFIG_USB_ETHER
