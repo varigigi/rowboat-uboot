@@ -1299,24 +1299,27 @@ static struct musb_hdrc_platform_data musb_plat = {
 int board_eth_init(bd_t *bis)
 {
 	int rv, n = 0;
-#ifdef CONFIG_DRIVER_TI_CPSW
+#if defined(CONFIG_DRIVER_TI_CPSW) || (defined(CONFIG_USB_ETHER) && \
+	(!defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_USB_ETH_SUPPORT)))
 	uint8_t mac_addr[6];
 	uint32_t mac_hi, mac_lo;
-	u_int32_t i;
 
-	if (!eth_getenv_enetaddr("ethaddr", mac_addr)) {
+	/* try reading mac address from efuse */
+	mac_lo = readl(MAC_ID0_LO);
+	mac_hi = readl(MAC_ID0_HI);
+	mac_addr[0] = mac_hi & 0xFF;
+	mac_addr[1] = (mac_hi & 0xFF00) >> 8;
+	mac_addr[2] = (mac_hi & 0xFF0000) >> 16;
+	mac_addr[3] = (mac_hi & 0xFF000000) >> 24;
+	mac_addr[4] = mac_lo & 0xFF;
+	mac_addr[5] = (mac_lo & 0xFF00) >> 8;
+
+#ifdef CONFIG_DRIVER_TI_CPSW
+	if (!getenv("ethaddr")) {
 		debug("<ethaddr> not set. Reading from E-fuse\n");
-		/* try reading mac address from efuse */
-		mac_lo = readl(MAC_ID0_LO);
-		mac_hi = readl(MAC_ID0_HI);
-		mac_addr[0] = mac_hi & 0xFF;
-		mac_addr[1] = (mac_hi & 0xFF00) >> 8;
-		mac_addr[2] = (mac_hi & 0xFF0000) >> 16;
-		mac_addr[3] = (mac_hi & 0xFF000000) >> 24;
-		mac_addr[4] = mac_lo & 0xFF;
-		mac_addr[5] = (mac_lo & 0xFF00) >> 8;
 
 		if (!is_valid_ether_addr(mac_addr)) {
+			u_int32_t i;
 			debug("Did not find a valid mac address in e-fuse. "
 					"Trying the one present in EEPROM\n");
 
@@ -1361,8 +1364,11 @@ int board_eth_init(bd_t *bis)
 	else
 		n += rv;
 #endif
+#endif
 #if defined(CONFIG_USB_ETHER) && \
 	(!defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_USB_ETH_SUPPORT))
+	if (is_valid_ether_addr(mac_addr))
+		eth_setenv_enetaddr("usbnet_devaddr", mac_addr);
 	rv = musb_register(&musb_plat, &musb_board_data, OTG_REGS_BASE);
 	if (rv < 0) {
 		printf("Error %d registering MUSB device\n", rv);
