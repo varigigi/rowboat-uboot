@@ -196,7 +196,6 @@ void set_default_env(const char *s)
 	gd->flags |= GD_FLG_ENV_READY;
 }
 
-#ifndef CONFIG_SPL_BUILD
 /*
  * Check if CRC is valid and (if yes) import the environment.
  * Note that "buf" may or may not be aligned.
@@ -227,7 +226,6 @@ int env_import(const char *buf, int check)
 
 	return 0;
 }
-#endif
 
 void env_relocate (void)
 {
@@ -249,7 +247,7 @@ void env_relocate (void)
 	}
 }
 
-#if defined(CONFIG_AUTO_COMPLETE) && !defined(CONFIG_SPL_BUILD)
+#ifdef CONFIG_AUTO_COMPLETE
 int env_complete(char *var, int maxv, char *cmdv[], int bufsz, char *buf)
 {
 	ENTRY *match;

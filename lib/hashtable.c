@@ -425,7 +425,6 @@ int hdelete_r(const char *key, struct hsearch_data *htab)
 	return 1;
 }
 
-#ifndef CONFIG_SPL_BUILD
 /*
  * hexport()
  */
@@ -585,7 +584,6 @@ ssize_t hexport_r(struct hsearch_data *htab, const char sep,
 
 	return size;
 }
-#endif
 
 
 /*

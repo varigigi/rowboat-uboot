@@ -100,7 +100,6 @@ int get_env_id(void)
 	return env_id;
 }
 
-#ifndef CONFIG_SPL_BUILD
 /*
  * Command interface: print one or all environment variables
  *
@@ -192,7 +191,6 @@ static int do_env_grep (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[
 
 	return rcode;
 }
-#endif
 #endif
 
 /*
@@ -379,7 +377,6 @@ int setenv(const char *varname, const char *varvalue)
 		return _do_env_set(0, 3, (char * const *)argv);
 }
 
-#ifndef CONFIG_SPL_BUILD
 int do_env_set(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	if (argc < 2)
@@ -480,7 +477,6 @@ int do_env_edit(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	return setenv(argv[1], buffer);
 }
 #endif /* CONFIG_CMD_EDITENV */
-#endif
 
 /*
  * Look up variable from environment,
@@ -545,8 +541,8 @@ int getenv_f(const char *name, char *buf, unsigned len)
 	return -1;
 }
 
-#ifndef CONFIG_SPL_BUILD
-#if defined(CONFIG_CMD_SAVEENV) && !defined(CONFIG_ENV_IS_NOWHERE)
+#if defined(CONFIG_CMD_SAVEENV) && !defined(CONFIG_ENV_IS_NOWHERE) && \
+	!defined(CONFIG_SPL_BUILD)
 
 int do_env_save(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
@@ -563,7 +559,6 @@ U_BOOT_CMD(
 	""
 );
 
-#endif
 #endif
 
 
@@ -585,7 +580,6 @@ int envmatch(uchar *s1, int i2)
 	return -1;
 }
 
-#ifndef CONFIG_SPL_BUILD
 static int do_env_default(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	if ((argc != 2) || (strcmp(argv[1], "-f") != 0))
@@ -879,7 +873,8 @@ static cmd_tbl_t cmd_env_sub[] = {
 #if defined(CONFIG_CMD_RUN)
 	U_BOOT_CMD_MKENT(run, CONFIG_SYS_MAXARGS, 1, do_run, "", ""),
 #endif
-#if defined(CONFIG_CMD_SAVEENV) && !defined(CONFIG_ENV_IS_NOWHERE)
+#if defined(CONFIG_CMD_SAVEENV) && !defined(CONFIG_ENV_IS_NOWHERE) && \
+	!defined(CONFIG_SPL_BUILD)
 	U_BOOT_CMD_MKENT(save, 1, 0, do_env_save, "", ""),
 #endif
 	U_BOOT_CMD_MKENT(set, CONFIG_SYS_MAXARGS, 0, do_env_set, "", ""),
@@ -1002,5 +997,4 @@ U_BOOT_CMD_COMPLETE(
 	"    - run the commands in the environment variable(s) 'var'",
 	var_complete
 );
-#endif
 #endif
