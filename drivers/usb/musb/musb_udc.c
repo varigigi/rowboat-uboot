@@ -59,7 +59,7 @@
 #include "omap3.h"
 #elif defined(CONFIG_USB_AM35X)
 #include "am35x.h"
-#elif defined(CONFIG_USB_AM335X)
+#elif defined(CONFIG_USB_MUSB_AM335X)
 #include "am335x.h"
 #elif defined(CONFIG_USB_DAVINCI)
 #include "davinci.h"
@@ -100,7 +100,7 @@ do {									\
 extern struct am35x_usb_regs *regs;
 #endif
 
-#ifdef	CONFIG_USB_AM335X
+#ifdef	CONFIG_USB_MUSB_AM335X
 extern struct am335x_usb_regs *regs;
 #endif
 
@@ -813,7 +813,7 @@ void udc_irq(void)
 			regs->ep_intsrcclr = intr_ep;
 			intrrx = (intr_ep & 0xFFFE0000) >> 16;
 			intrtx = intr_ep & 0xFFFF;
-#elif defined(CONFIG_USB_AM335X)
+#elif defined(CONFIG_USB_MUSB_AM335X)
 			/* Read TI registers for AM35X, not MUSB registers */
 			intr_ep = regs->irq_status0;
 			regs->irq_status0 = intr_ep;

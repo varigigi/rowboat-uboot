@@ -171,6 +171,7 @@ static struct usb_device_descriptor device_descriptor = {
 	.bDeviceProtocol =	0x00,
 	.bMaxPacketSize0 =	EP0_MAX_PACKET_SIZE,
 	.idVendor =		cpu_to_le16(CONFIG_USBD_VENDORID),
+	.idProduct =		cpu_to_le16(CONFIG_USBD_PRODUCTID),
 	.bcdDevice =		cpu_to_le16(USBFBT_BCD_DEVICE),
 	.iManufacturer =	STR_MANUFACTURER,
 	.iProduct =		STR_PRODUCT,
@@ -1337,10 +1338,12 @@ static void set_serial_number(void)
 {
 	char *dieid = getenv("dieid#");
 	if (dieid == NULL) {
-		priv.serial_no = "00123";
+		printf("Setting serial number from constant (no dieid info)\n");
+		strncpy(serial_number, "00123", sizeof("00123"));
 	} else {
 		int len;
 
+		printf("Setting serial number from unique id\n");
 		memset(&serial_number[0], 0, 28);
 		len = strlen(dieid);
 		if (len > 28)
@@ -1348,8 +1351,9 @@ static void set_serial_number(void)
 
 		strncpy(&serial_number[0], dieid, len);
 
-		priv.serial_no = &serial_number[0];
 	}
+	priv.serial_no = serial_number;
+	printf("fastboot serial_number = %s\n", serial_number);
 }
 
 static int fbt_fastboot_init(void)

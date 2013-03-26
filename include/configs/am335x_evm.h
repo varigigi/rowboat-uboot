@@ -134,7 +134,7 @@ to a higher value if a higher sized RAM support is available in Hardware */
 #define CONFIG_USBD_PRODUCT_NAME        "EVM"
 #endif /* CONFIG_MUSB_UDC */
 
-#endif /* CONFIG_USB_AM335X */
+#endif /* CONFIG_USB_MUSB_AM335X */
 
 /* commands to include */
 
