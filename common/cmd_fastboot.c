@@ -2119,8 +2119,6 @@ int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			break;
 		}
 
-		/* TODO: It is a workaround for fastboot file download hang issue */
-		udelay(1000); /* 1 msec of delay */
 	}
 
 	return ret;
