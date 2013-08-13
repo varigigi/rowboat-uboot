@@ -35,6 +35,16 @@ static struct phy_driver KSZ804_driver = {
 	.shutdown = &genphy_shutdown,
 };
 
+static struct phy_driver KS8051_driver = {
+	.name = "Micrel KS8051",
+	.uid = 0x221550,
+	.mask = 0xfffff0,
+	.features = PHY_BASIC_FEATURES,
+	.config = &genphy_config,
+	.startup = &genphy_startup,
+	.shutdown = &genphy_shutdown,
+};
+
 #ifndef CONFIG_PHY_MICREL_KSZ9021
 /*
  * I can't believe Micrel used the exact same part number
@@ -140,6 +150,7 @@ static struct phy_driver ksz9021_driver = {
 int phy_micrel_init(void)
 {
 	phy_register(&KSZ804_driver);
+	phy_register(&KS8051_driver);
 #ifdef CONFIG_PHY_MICREL_KSZ9021
 	phy_register(&ksz9021_driver);
 #else
