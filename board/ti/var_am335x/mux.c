@@ -77,8 +77,12 @@ static struct module_pin_mux gpio2_19_pin_mux[] = {
 
 static struct module_pin_mux clkout_pin_mux[] = {
    {OFFSET(xdma_event_intr0), MODE(3)},	   /* clkout1 */
-   {OFFSET(xdma_event_intr1), MODE(3)},	   /* clkout2 */
    {-1},
+};
+
+static struct module_pin_mux bt_uart_select_pin_mux[] = {
+	{OFFSET(xdma_event_intr1), MODE(7)},    /* GPIO0_20 */
+	{-1},
 };
 
 static struct module_pin_mux rmii1_pin_mux[] = {
@@ -137,4 +141,5 @@ void enable_board_pin_mux()
 	configure_module_pin_mux(gpio0_2_pin_mux);
 	configure_module_pin_mux(gpio2_19_pin_mux);
 	configure_module_pin_mux(clkout_pin_mux);
+	configure_module_pin_mux(bt_uart_select_pin_mux);
 }

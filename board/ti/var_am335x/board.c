@@ -37,6 +37,7 @@
 #include "pmic.h"
 
 #define GPIO_LCD_BACKLIGHT     2
+#define GPIO_BT_UART_SELECT    20
 #define GPIO_SOM_REV_BIT0_GPIO 77
 #define GPIO_SOM_REV_BIT1_GPIO 86
 #define GPIO_SOM_REV_BIT2_GPIO 75
@@ -321,6 +322,10 @@ int board_init(void)
 	/* Turn off LCD */
 	gpio_request(GPIO_LCD_BACKLIGHT, "backlight");
 	gpio_direction_output(GPIO_LCD_BACKLIGHT, 0);
+
+	/* mux bluetooth to omap */
+	gpio_request(GPIO_BT_UART_SELECT, "bt_uart_select");
+	gpio_direction_output(GPIO_BT_UART_SELECT, 1);
 
 	return 0;
 }
