@@ -98,6 +98,10 @@ static int do_imls(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]);
 static void fixup_silent_linux(void);
 #endif
 
+#ifdef CONFIG_VARISCITE_TOUCHSCREEN
+static void setup_variscite_touchscreen_type (void);
+#endif	
+
 static image_header_t *image_get_kernel(ulong img_addr, int verify);
 #if defined(CONFIG_FIT)
 static int fit_check_kernel(const void *fit, int os_noffset, int verify);
@@ -709,6 +713,10 @@ int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		fixup_silent_linux();
 #endif
 
+#ifdef CONFIG_VARISCITE_TOUCHSCREEN
+	setup_variscite_touchscreen_type();
+#endif	
+
 	boot_fn = boot_os[images.os.os];
 
 	if (boot_fn == NULL) {
@@ -1300,6 +1308,26 @@ static void fixup_silent_linux(void)
 	debug("after silent fix-up: %s\n", buf);
 }
 #endif /* CONFIG_SILENT_CONSOLE */
+
+#ifdef CONFIG_VARISCITE_TOUCHSCREEN
+static void setup_variscite_touchscreen_type(void)
+{
+	char buf[256];
+	char *cmdline = getenv ("bootargs");
+
+	if (cmdline == NULL)
+		return;
+
+	strcpy (buf, cmdline);
+
+	if (i2c_probe(0x38) == 0) {
+		strcat (buf, " var_ts_type=ctw6120");
+	}
+
+	setenv ("bootargs", buf);
+}
+#endif /* CONFIG_SILENT_CONSOLE */
+
 
 
 /*******************************************************************/
